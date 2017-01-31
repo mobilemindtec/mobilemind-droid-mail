@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>br.com.mobilemind.api</groupId>
+    <artifactId>mobilemind-droid-mail</artifactId>
+    <version>1.3</version>
+    <packaging>jar</packaging>
+    <name>Mobile Mind - Mail Droid</name>
+
+    <properties>        
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>        
+    </properties>
+
+
+    <distributionManagement>
+        <!-- Publish the versioned releases here -->
+        <repository>
+            <id>mobile-mind-droid</id>
+            <name>vineetmanohar nexus</name>
+            <url>scpexe://nexus.mobilemind.com.br:/home/maven/mobile-mind-droid</url>
+        </repository>    
+
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>mobile-mind-droid</id>
+            <name>vineetmanohar</name>
+            <url>http://nexus.mobilemind.com.br/nexus/content/repositories/mobile-mind-droid</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>mobile-mind</id>
+            <name>vineetmanohar</name>
+            <url>http://nexus.mobilemind.com.br/nexus/content/repositories/mobile-mind</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository> 
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>android</artifactId>
+            <version>2.2.1</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>json</artifactId>
+                    <groupId>org.json</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+		
+        <dependency>
+            <groupId>br.com.mobilemind.api</groupId>
+            <artifactId>mobilemind-droid-util</artifactId>
+            <version>1.3</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>br.com.mobilemind.api</groupId>
+            <artifactId>mobilemind-utils</artifactId>
+            <version>1.2</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>br.com.mobilemind.api</groupId>
+            <artifactId>mobilemind-json</artifactId>
+            <version>1.1</version>
+        </dependency>
+                	
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8</version>
+            <scope>test</scope>
+        </dependency>
+                            
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>portal-war</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>enableCiProfile</name>
+                    <value>true</value>
+                </property>
+            </activation> 
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>license-maven-plugin</artifactId>
+                        <configuration>
+                            <licenseName>gpl_v2</licenseName>
+                            <organizationName>Mobile Mind Empresa de Tecnologia</organizationName>
+                            <inceptionYear>2012</inceptionYear>
+                            <verbose>true</verbose>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>first</id>
+                                <goals>
+                                    <goal>update-file-header</goal>
+                                </goals>
+                                <phase>process-sources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>                  
+                </plugins>                        
+
+
+            </build>
+        </profile>
+    </profiles>   
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
+
+    
+        <extensions>
+          <!-- Enabling the use of SSH -->
+          <extension>
+            <groupId>org.apache.maven.wagon</groupId>
+             <artifactId>wagon-ssh-external</artifactId>
+             <version>1.0-beta-6</version>
+          </extension>
+        </extensions>        
+
+    </build>
+</project>
