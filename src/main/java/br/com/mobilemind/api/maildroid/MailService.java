@@ -63,6 +63,7 @@ public class MailService {
     private WsExecutor executor;
     private ProgressBarManager progressBar;
     private List<MailDroidProcessListener> mailDroidProcessListener = new LinkedList<MailDroidProcessListener>();
+    private boolean backgroundMode;
 
     public MailService() {
     }
@@ -89,6 +90,10 @@ public class MailService {
         }
     }
 
+    public void setBackgroundMode(boolean backgroundMode){
+        this.backgroundMode = backgroundMode;        
+    }
+
     /**
      * send a new e-mail
      *
@@ -97,17 +102,21 @@ public class MailService {
      */
     public void send(final Email email) {
 
-        if (progressBar != null) {
-            progressBar.setMessage("Enviando e-mail.. Aguarde..");
-            progressBar.setTitle("Mobile Mind");
-            progressBar.openProgressDialog();
+        if(!this.backgroundMode){
+            if (progressBar != null) {
+                progressBar.setMessage("Enviando e-mail.. Aguarde..");
+                progressBar.setTitle("Mobile Mind");
+                progressBar.openProgressDialog();
+            }
         }
 
         if (executor == null) {
             executor = new WsExecutor();
         }
 
-        executor.setTestConnection(true);
+        if(!this.backgroundMode){
+            executor.setTestConnection(true);
+        }
 
         new Thread(new Runnable() {
             @Override
@@ -142,27 +151,31 @@ public class MailService {
                     executor.setEntity(jsonConverter.toJSON(email).toString());
                     executor.executePost();
 
-                    if (progressBar != null) {
-                        progressBar.closeProgressDialog();
-                        progressBar.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Dialog.showSuccess(context, "O e-mail foi enviado com sucesso!");
-                            }
-                        });
+                    if(!backgroundMode){
+                        if (progressBar != null) {
+                            progressBar.closeProgressDialog();
+                            progressBar.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Dialog.showSuccess(context, "O e-mail foi enviado com sucesso!");
+                                }
+                            });
+                        }
                     }
                     for (MailDroidProcessListener it : mailDroidProcessListener) {
                         it.onSuccess();
                     }
                 } catch (Exception e) {
-                    if (progressBar != null) {
-                        progressBar.closeProgressDialog();
-                        progressBar.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Dialog.showWarning(context, "Não foi possível enviar o e-mail de logs. Verifique sua conexão com a internet e tente novamente.");
-                            }
-                        });
+                    if(!backgroundMode){
+                        if (progressBar != null) {
+                            progressBar.closeProgressDialog();
+                            progressBar.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Dialog.showWarning(context, MailDroidResource.getProperty("br.com.mobilemind.report.error"));
+                                }
+                            });
+                        }
                     }
 
                     MMLogger.log(Level.SEVERE, MailService.class, e);
