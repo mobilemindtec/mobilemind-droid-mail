@@ -29,6 +29,7 @@ import android.view.View;
 import br.com.mobilemind.api.droidutil.dialog.Dialog;
 import br.com.mobilemind.api.droidutil.dialog.DialogResult;
 import br.com.mobilemind.api.droidutil.dialog.OnRespostEvent;
+import br.com.mobilemind.api.droidutil.dialog.RespostaListener;
 import br.com.mobilemind.api.droidutil.logs.AppLogger;
 import br.com.mobilemind.api.droidutil.logs.LoggerConfigurarionBuilder;
 import br.com.mobilemind.api.droidutil.rest.WsExecutor;
@@ -157,31 +158,54 @@ public class MailService {
                             progressBar.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Dialog.showSuccess(context, "O e-mail foi enviado com sucesso!");
+                                    Dialog.showInfo(context, "O e-mail foi enviado com sucesso!",  new RespostaListener() {
+                                    @Override
+                                    public void onCancel() {
+                                        for (MailDroidProcessListener it : mailDroidProcessListener) {
+                                            it.onSuccess();
+                                        }                                        
+                                    }
+
+                                    @Override
+                                    public void onOk() {
+                                        for (MailDroidProcessListener it : mailDroidProcessListener) {
+                                            it.onSuccess();
+                                        }
+                                    }
+                                });
                                 }
                             });
                         }
                     }
-                    for (MailDroidProcessListener it : mailDroidProcessListener) {
-                        it.onSuccess();
-                    }
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     if(!backgroundMode){
                         if (progressBar != null) {
                             progressBar.closeProgressDialog();
                             progressBar.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Dialog.showWarning(context, MailDroidResource.getProperty("br.com.mobilemind.report.error"));
+                                    Dialog.showInfo(context, MailDroidResource.getProperty("br.com.mobilemind.report.error"),  new RespostaListener() {
+                                    @Override
+                                    public void onCancel() {
+                                        for (MailDroidProcessListener it : mailDroidProcessListener) {
+                                            it.onError(e);
+                                        }                                        
+                                    }
+
+                                    @Override
+                                    public void onOk() {
+                                        for (MailDroidProcessListener it : mailDroidProcessListener) {
+                                            it.onError(e);
+                                        }
+                                    }
+                                });
                                 }
                             });
                         }
                     }
 
                     MMLogger.log(Level.SEVERE, MailService.class, e);
-                    for (MailDroidProcessListener it : mailDroidProcessListener) {
-                        it.onError(e);
-                    }
+                    
                 }
             }
         }).start();
